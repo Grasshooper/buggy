@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React ,{ useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, Text, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { toast } from 'sonner-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Add this import
 import ExpenseForm, { Expense } from '../components/ExpenseForm';
 import ExpenseChart from '../components/ExpenseChart';
 import ExpenseList from '../components/ExpenseList';
@@ -15,7 +16,10 @@ const STORAGE_KEY = '@expenses';
 export default function HomeScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [activeTab, setActiveTab] = useState<'daily' | 'monthly'>('daily');
-  const fadeAnim = new Animated.Value(1);  useFocusEffect(
+  const fadeAnim = new Animated.Value(1);
+  const navigation = useNavigation(); // Add this
+
+  useFocusEffect(
     React.useCallback(() => {
       loadExpenses();
     }, [])
@@ -84,11 +88,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>          <Text style={styles.title}>Budget Tracker</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Budget Tracker</Text>
           <View style={styles.headerButtons}>
             <Pressable 
               style={styles.iconButton} 
-              onPress={() => navigation.navigate('Profile')}
+              onPress={() => navigation.navigate('Profile' as never)}
             >
               <MaterialIcons name="person-outline" size={24} color="#2E7D32" />
             </Pressable>
@@ -135,7 +140,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-  },  headerButtons: {
+  },
+  headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
