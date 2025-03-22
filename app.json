@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "a0-project",
+    "name": "buggy",
     "slug": "snack-44308332-fa14-447e-8112-737da21cffa7",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,6 +24,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "Quickly generate React Native components with AI"
+    "description": "Manage your budgets"
   }
 }
