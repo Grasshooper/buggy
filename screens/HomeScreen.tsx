@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons';
-import { toast } from 'sonner-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import ExpenseForm, { Expense } from '../components/ExpenseForm';
-import ExpenseChart from '../components/ExpenseChart';
-import ExpenseList from '../components/ExpenseList';
-import TabBar from '../components/TabBar';
-import ExpenseStats from '../components/ExpenseStats';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, Pressable, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
+import { toast } from "sonner-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import ExpenseForm, { Expense } from "../components/ExpenseForm";
+import ExpenseChart from "../components/ExpenseChart";
+import ExpenseList from "../components/ExpenseList";
+import TabBar from "../components/TabBar";
+import ExpenseStats from "../components/ExpenseStats";
 
-const STORAGE_KEY = '@expenses';
+const STORAGE_KEY = "@expenses";
 
 export default function HomeScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [activeTab, setActiveTab] = useState<'daily' | 'monthly'>('daily');
+  const [activeTab, setActiveTab] = useState<"daily" | "monthly">("daily");
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -31,7 +31,7 @@ export default function HomeScreen() {
         setExpenses(JSON.parse(savedExpenses));
       }
     } catch (error) {
-      toast.error('Failed to load expenses');
+      toast.error("Failed to load expenses");
     }
   };
 
@@ -41,7 +41,7 @@ export default function HomeScreen() {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newExpenses));
     } catch (error) {
-      toast.error('Failed to save expense');
+      toast.error("Failed to save expense");
     }
   };
 
@@ -49,24 +49,32 @@ export default function HomeScreen() {
     try {
       await AsyncStorage.removeItem(STORAGE_KEY);
       setExpenses([]);
-      toast.success('All expenses cleared');
+      toast.success("All expenses cleared");
     } catch (error) {
-      toast.error('Failed to clear expenses');
+      toast.error("Failed to clear expenses");
     }
   };
 
-  const handleTabChange = (tab: 'daily' | 'monthly') => {
+  const handleTabChange = (tab: "daily" | "monthly") => {
     setActiveTab(tab);
   };
 
   const getCurrentExpenses = () => {
     const now = new Date();
-    if (activeTab === 'daily') {
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      return expenses.filter(expense => expense.timestamp >= today);
+    if (activeTab === "daily") {
+      const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      ).getTime();
+      return expenses.filter((expense) => expense.timestamp >= today);
     } else {
-      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      return expenses.filter(expense => expense.timestamp >= firstDayOfMonth);
+      const firstDayOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      ).getTime();
+      return expenses.filter((expense) => expense.timestamp >= firstDayOfMonth);
     }
   };
 
@@ -76,25 +84,29 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Text style={styles.title}>Budget Tracker</Text>
+          <Text style={styles.title}>Buggy</Text>
           <View style={styles.headerButtons}>
-            <Pressable 
-              style={styles.iconButton} 
-              onPress={() => navigation.navigate('Profile' as never)}
+            <Pressable
+              style={styles.iconButton}
+              onPress={() => navigation.navigate("Profile" as never)}
             >
               <MaterialIcons name="person-outline" size={24} color="#2E7D32" />
             </Pressable>
             {expenses.length > 0 && (
               <Pressable style={styles.iconButton} onPress={handleClearAll}>
-                <MaterialIcons name="delete-outline" size={24} color="#E53935" />
+                <MaterialIcons
+                  name="delete-outline"
+                  size={24}
+                  color="#E53935"
+                />
               </Pressable>
             )}
           </View>
         </View>
-        
+
         <View style={styles.content}>
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
-          
+
           <View>
             <ExpenseStats expenses={expenses} type={activeTab} />
             <ExpenseForm onAddExpense={handleAddExpense} />
@@ -112,25 +124,25 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   iconButton: {
