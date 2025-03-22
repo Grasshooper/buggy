@@ -45,19 +45,29 @@ export interface Expense {
 
 interface ExpenseFormProps {
   onAddExpense: (expense: Expense) => void;
+  currency?: string; // Make currency a prop instead of using AsyncStorage
 }
 
-export default function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
+export default function ExpenseForm({
+  onAddExpense,
+  currency = "EUR",
+}: ExpenseFormProps) {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Food");
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [useCustomCategories, setUseCustomCategories] = useState(false);
-  const [currencySymbol, setCurrencySymbol] = useState("€"); // Default to Euro symbol
+  const [currencySymbol, setCurrencySymbol] = useState(
+    CURRENCY_SYMBOLS[currency] || "€"
+  );
 
   useEffect(() => {
     loadUserProfile();
-    loadCurrencySettings();
   }, []);
+
+  // Update currency symbol when currency prop changes
+  useEffect(() => {
+    setCurrencySymbol(CURRENCY_SYMBOLS[currency] || "€");
+  }, [currency]);
 
   const loadUserProfile = async () => {
     try {
@@ -69,17 +79,6 @@ export default function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
       }
     } catch (error) {
       console.error("Failed to load profile:", error);
-    }
-  };
-
-  const loadCurrencySettings = async () => {
-    try {
-      const selectedCurrency = await AsyncStorage.getItem("@selectedCurrency");
-      if (selectedCurrency) {
-        setCurrencySymbol(CURRENCY_SYMBOLS[selectedCurrency] || "€");
-      }
-    } catch (error) {
-      console.error("Failed to load currency settings:", error);
     }
   };
 

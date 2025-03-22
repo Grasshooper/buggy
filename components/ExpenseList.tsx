@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Expense } from "./ExpenseForm";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Currency symbol map
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -18,25 +17,21 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 interface ExpenseListProps {
   expenses: Expense[];
+  currency?: string; // Make currency a prop instead of using AsyncStorage
 }
 
-export default function ExpenseList({ expenses }: ExpenseListProps) {
-  const [currencySymbol, setCurrencySymbol] = useState("€"); // Default to Euro symbol
+export default function ExpenseList({
+  expenses,
+  currency = "EUR",
+}: ExpenseListProps) {
+  const [currencySymbol, setCurrencySymbol] = useState(
+    CURRENCY_SYMBOLS[currency] || "€"
+  );
 
+  // Update currency symbol when currency prop changes
   useEffect(() => {
-    loadCurrencySettings();
-  }, []);
-
-  const loadCurrencySettings = async () => {
-    try {
-      const selectedCurrency = await AsyncStorage.getItem("@selectedCurrency");
-      if (selectedCurrency) {
-        setCurrencySymbol(CURRENCY_SYMBOLS[selectedCurrency] || "€");
-      }
-    } catch (error) {
-      console.error("Failed to load currency settings:", error);
-    }
-  };
+    setCurrencySymbol(CURRENCY_SYMBOLS[currency] || "€");
+  }, [currency]);
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {

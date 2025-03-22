@@ -16,11 +16,14 @@ const STORAGE_KEY = "@expenses";
 export default function HomeScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [activeTab, setActiveTab] = useState<"daily" | "monthly">("daily");
+  const [selectedCurrency, setSelectedCurrency] = useState("EUR");
   const navigation = useNavigation();
 
+  // Load expenses and currency whenever the screen gains focus
   useFocusEffect(
     React.useCallback(() => {
       loadExpenses();
+      loadCurrency();
     }, [])
   );
 
@@ -32,6 +35,17 @@ export default function HomeScreen() {
       }
     } catch (error) {
       toast.error("Failed to load expenses");
+    }
+  };
+
+  const loadCurrency = async () => {
+    try {
+      const currency = await AsyncStorage.getItem("@selectedCurrency");
+      if (currency) {
+        setSelectedCurrency(currency);
+      }
+    } catch (error) {
+      console.error("Failed to load currency setting:", error);
     }
   };
 
@@ -108,12 +122,25 @@ export default function HomeScreen() {
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
 
           <View>
-            <ExpenseStats expenses={expenses} type={activeTab} />
-            <ExpenseForm onAddExpense={handleAddExpense} />
+            <ExpenseStats
+              expenses={expenses}
+              type={activeTab}
+              currency={selectedCurrency}
+            />
+            <ExpenseForm
+              onAddExpense={handleAddExpense}
+              currency={selectedCurrency}
+            />
             <View style={styles.spacer} />
-            <ExpenseChart expenses={currentExpenses} />
+            <ExpenseChart
+              expenses={currentExpenses}
+              currency={selectedCurrency}
+            />
             <View style={styles.spacer} />
-            <ExpenseList expenses={currentExpenses} />
+            <ExpenseList
+              expenses={currentExpenses}
+              currency={selectedCurrency}
+            />
           </View>
         </View>
       </ScrollView>

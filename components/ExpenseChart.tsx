@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { Expense } from "./ExpenseForm";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Currency symbol map
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -19,6 +18,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 interface ExpenseChartProps {
   expenses: Expense[];
+  currency?: string; // Make currency a prop instead of using AsyncStorage
 }
 
 const COLORS = [
@@ -32,23 +32,18 @@ const COLORS = [
   "#00796B",
 ];
 
-export default function ExpenseChart({ expenses }: ExpenseChartProps) {
-  const [currencySymbol, setCurrencySymbol] = useState("€"); // Default to Euro symbol
+export default function ExpenseChart({
+  expenses,
+  currency = "EUR",
+}: ExpenseChartProps) {
+  const [currencySymbol, setCurrencySymbol] = useState(
+    CURRENCY_SYMBOLS[currency] || "€"
+  );
 
+  // Update currency symbol when currency prop changes
   useEffect(() => {
-    loadCurrencySettings();
-  }, []);
-
-  const loadCurrencySettings = async () => {
-    try {
-      const selectedCurrency = await AsyncStorage.getItem("@selectedCurrency");
-      if (selectedCurrency) {
-        setCurrencySymbol(CURRENCY_SYMBOLS[selectedCurrency] || "€");
-      }
-    } catch (error) {
-      console.error("Failed to load currency settings:", error);
-    }
-  };
+    setCurrencySymbol(CURRENCY_SYMBOLS[currency] || "€");
+  }, [currency]);
 
   const categoryTotals = expenses.reduce((acc, curr) => {
     acc[curr.category] = (acc[curr.category] || 0) + curr.amount;

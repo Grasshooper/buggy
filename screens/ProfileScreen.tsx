@@ -15,7 +15,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { toast } from "sonner-native";
 import { useNavigation } from "@react-navigation/native";
 import IntlPhoneField, {
-  ICountryCca2,
+  ICountry,
 } from "react-native-international-phone-number";
 
 interface UserProfile {
@@ -23,7 +23,7 @@ interface UserProfile {
   lastName: string;
   email: string;
   phoneNumber: string;
-  phoneCountryCode: ICountryCca2;
+  phoneCountryCode: string;
   phoneCountryDialCode: string;
   currency: string;
   customCategories: string[];
@@ -35,7 +35,7 @@ const DEFAULT_PROFILE: UserProfile = {
   lastName: "",
   email: "",
   phoneNumber: "",
-  phoneCountryCode: "GB" as ICountryCca2,
+  phoneCountryCode: "GB",
   phoneCountryDialCode: "+44",
   currency: "EUR",
   customCategories: [],
@@ -76,6 +76,9 @@ export default function ProfileScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigation = useNavigation();
 
+  // Create state for the phone input component
+  const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(null);
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -111,10 +114,6 @@ export default function ProfileScreen() {
             parsedProfile.lastName ||
             parsedProfile.name?.split(" ").slice(1).join(" ") ||
             "",
-          // Ensure phoneCountryCode is properly typed as ICountryCca2
-          phoneCountryCode: (parsedProfile.phoneCountryCode ||
-            "GB") as ICountryCca2,
-          phoneCountryDialCode: parsedProfile.phoneCountryDialCode || "+44",
         };
         setProfile(updatedProfile);
         setOriginalProfile(updatedProfile);
@@ -213,16 +212,16 @@ export default function ProfileScreen() {
   };
 
   // Phone number change handler for IntlPhoneField
-  const handlePhoneChange = (data: any) => {
-    updateProfile("phoneNumber", data.phoneNumber);
-    if (data.selectedCountry && data.selectedCountry.code) {
-      updateProfile(
-        "phoneCountryCode",
-        data.selectedCountry.code as ICountryCca2
-      );
-    }
-    if (data.selectedCountry && data.selectedCountry.dialCode) {
-      updateProfile("phoneCountryDialCode", data.selectedCountry.dialCode);
+  const handlePhoneChange = (value: string) => {
+    updateProfile("phoneNumber", value);
+  };
+
+  // Handle country change
+  const handleCountryChange = (country: ICountry) => {
+    setSelectedCountry(country);
+    if (country) {
+      updateProfile("phoneCountryCode", country.cca2);
+      updateProfile("phoneCountryDialCode", `+${country.callingCode}`);
     }
   };
 
@@ -284,16 +283,15 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.phoneContainer}>
             <Text style={styles.label}>Phone Number</Text>
-            <IntlPhoneField
-              defaultCountry={profile.phoneCountryCode}
-              defaultValue={profile.phoneNumber}
-              onChangeText={handlePhoneChange}
-              containerStyle={styles.phoneFieldContainer}
-              textInputStyle={styles.phoneFieldInput}
-              dialCodeTextStyle={styles.phoneFieldDialCode}
-              flagButtonStyle={styles.phoneFieldFlag}
-              placeholder="Enter your phone number"
-            />
+            <View style={styles.phoneFieldContainer}>
+              <IntlPhoneField
+                value={profile.phoneNumber}
+                onChangePhoneNumber={handlePhoneChange}
+                selectedCountry={selectedCountry}
+                onChangeSelectedCountry={handleCountryChange}
+                placeholder="Enter your phone number"
+              />
+            </View>
           </View>
         </View>
 
@@ -467,19 +465,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 8,
-    height: 50,
-  },
-  phoneFieldInput: {
-    fontSize: 16,
-    color: "#333",
-  },
-  phoneFieldDialCode: {
-    fontSize: 16,
-    color: "#333",
-  },
-  phoneFieldFlag: {
-    borderRightWidth: 1,
-    borderRightColor: "#E0E0E0",
+    overflow: "hidden",
   },
   currencyList: {
     flexDirection: "row",

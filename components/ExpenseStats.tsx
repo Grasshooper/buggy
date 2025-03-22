@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Expense } from "./ExpenseForm";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Currency symbol map
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -20,25 +19,22 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 interface ExpenseStatsProps {
   expenses: Expense[];
   type: "daily" | "monthly";
+  currency?: string; // Make currency a prop instead of using AsyncStorage
 }
 
-export default function ExpenseStats({ expenses, type }: ExpenseStatsProps) {
-  const [currencySymbol, setCurrencySymbol] = useState("€"); // Default to Euro symbol
+export default function ExpenseStats({
+  expenses,
+  type,
+  currency = "EUR",
+}: ExpenseStatsProps) {
+  const [currencySymbol, setCurrencySymbol] = useState(
+    CURRENCY_SYMBOLS[currency] || "€"
+  );
 
+  // Update currency symbol when currency prop changes
   useEffect(() => {
-    loadCurrencySettings();
-  }, []);
-
-  const loadCurrencySettings = async () => {
-    try {
-      const selectedCurrency = await AsyncStorage.getItem("@selectedCurrency");
-      if (selectedCurrency) {
-        setCurrencySymbol(CURRENCY_SYMBOLS[selectedCurrency] || "€");
-      }
-    } catch (error) {
-      console.error("Failed to load currency settings:", error);
-    }
-  };
+    setCurrencySymbol(CURRENCY_SYMBOLS[currency] || "€");
+  }, [currency]);
 
   const getCurrentStats = () => {
     const now = new Date();
