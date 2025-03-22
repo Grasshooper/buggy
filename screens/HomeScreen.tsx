@@ -1,10 +1,10 @@
-import React ,{ useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, Text, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { toast } from 'sonner-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Add this import
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import ExpenseForm, { Expense } from '../components/ExpenseForm';
 import ExpenseChart from '../components/ExpenseChart';
 import ExpenseList from '../components/ExpenseList';
@@ -16,8 +16,7 @@ const STORAGE_KEY = '@expenses';
 export default function HomeScreen() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [activeTab, setActiveTab] = useState<'daily' | 'monthly'>('daily');
-  const fadeAnim = new Animated.Value(1);
-  const navigation = useNavigation(); // Add this
+  const navigation = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -57,18 +56,6 @@ export default function HomeScreen() {
   };
 
   const handleTabChange = (tab: 'daily' | 'monthly') => {
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
     setActiveTab(tab);
   };
 
@@ -108,14 +95,14 @@ export default function HomeScreen() {
         <View style={styles.content}>
           <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
           
-          <Animated.View style={{ opacity: fadeAnim }}>
+          <View>
             <ExpenseStats expenses={expenses} type={activeTab} />
             <ExpenseForm onAddExpense={handleAddExpense} />
             <View style={styles.spacer} />
             <ExpenseChart expenses={currentExpenses} />
             <View style={styles.spacer} />
             <ExpenseList expenses={currentExpenses} />
-          </Animated.View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
